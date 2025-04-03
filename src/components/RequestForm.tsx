@@ -21,6 +21,7 @@ const RequestForm = () => {
     plan: "standard",
     requirements: "",
     website: "",
+    integration_type: "chatbot", // Default selection
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,6 +36,10 @@ const RequestForm = () => {
 
   const handleRadioChange = (value: string) => {
     setFormData((prev) => ({ ...prev, plan: value }));
+  };
+
+  const handleIntegrationTypeChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, integration_type: value }));
   };
 
   const isValidBusinessEmail = (email: string) => {
@@ -82,7 +87,9 @@ const RequestForm = () => {
           phone: formData.phone,
           plan: formData.plan,
           requirements: formData.requirements,
-          business_size: "unknown" // This field is required but not in our form
+          business_size: "unknown", // This field is required but not in our form
+          // Add the integration type to the requirements field
+          requirements: `Integration Type: ${formData.integration_type}\n\n${formData.requirements}`
         });
       
       if (error) throw error;
@@ -102,6 +109,7 @@ const RequestForm = () => {
         plan: "standard",
         requirements: "",
         website: "",
+        integration_type: "chatbot",
       });
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -188,6 +196,43 @@ const RequestForm = () => {
                 className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
               />
             </div>
+          </div>
+          
+          <div className="space-y-3">
+            <Label>Select Integration Type</Label>
+            <RadioGroup 
+              value={formData.integration_type} 
+              onValueChange={handleIntegrationTypeChange} 
+              className="flex flex-col space-y-3"
+            >
+              <div className="flex items-start space-x-3 border border-white/20 p-4 rounded-md hover:bg-white/10 transition-colors backdrop-blur-sm">
+                <RadioGroupItem value="chatbot" id="chatbot" className="mt-1" />
+                <div>
+                  <Label htmlFor="chatbot" className="font-semibold text-base">Chatbot</Label>
+                  <p className="text-muted-foreground text-sm">
+                    AI chatbot that can answer customer questions and provide support.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 border border-white/20 p-4 rounded-md hover:bg-white/10 transition-colors backdrop-blur-sm">
+                <RadioGroupItem value="standalone" id="standalone" className="mt-1" />
+                <div>
+                  <Label htmlFor="standalone" className="font-semibold text-base">Standalone App</Label>
+                  <p className="text-muted-foreground text-sm">
+                    A dedicated AI application separate from your existing website.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3 border border-white/20 p-4 rounded-md hover:bg-white/10 transition-colors backdrop-blur-sm">
+                <RadioGroupItem value="integrated" id="integrated" className="mt-1" />
+                <div>
+                  <Label htmlFor="integrated" className="font-semibold text-base">Integrated Solution</Label>
+                  <p className="text-muted-foreground text-sm">
+                    Seamless integration with your existing website or platform.
+                  </p>
+                </div>
+              </div>
+            </RadioGroup>
           </div>
           
           <div className="space-y-3">
