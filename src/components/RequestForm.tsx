@@ -37,9 +37,7 @@ const RequestForm = () => {
     // This would be replaced with your actual Supabase integration
     // For now, we'll just simulate the submission
     try {
-      // Here you would add your Supabase client code to save the data
-      // const { data, error } = await supabase.from('requests').insert([formData])
-      
+      // Simulate API call
       setTimeout(() => {
         setSubmitting(false);
         toast({
@@ -69,125 +67,128 @@ const RequestForm = () => {
   };
 
   return (
-    <section id="request-form" className="py-20 bg-muted">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Request AI Integration</h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Fill out the form below to get started with your AI automation project.
-          </p>
-        </div>
-        
-        <Card className="max-w-3xl mx-auto">
-          <CardHeader>
-            <CardTitle>Integration Request</CardTitle>
-            <CardDescription>
-              Provide your contact information and project details.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input 
-                    id="name" 
-                    name="name" 
-                    value={formData.name} 
-                    onChange={handleChange} 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input 
-                    id="email" 
-                    name="email" 
-                    type="email" 
-                    value={formData.email} 
-                    onChange={handleChange} 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="company">Company Name</Label>
-                  <Input 
-                    id="company" 
-                    name="company" 
-                    value={formData.company} 
-                    onChange={handleChange} 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input 
-                    id="phone" 
-                    name="phone" 
-                    value={formData.phone} 
-                    onChange={handleChange} 
-                    required 
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Select Integration Plan</Label>
-                <RadioGroup 
-                  value={formData.plan} 
-                  onValueChange={handleRadioChange} 
-                  className="flex flex-col space-y-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="standard" id="standard" />
-                    <Label htmlFor="standard" className="font-normal">Standard Integration ($1,999)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="enterprise" id="enterprise" />
-                    <Label htmlFor="enterprise" className="font-normal">Enterprise Integration ($4,999)</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="requirements">Project Requirements</Label>
-                <Textarea 
-                  id="requirements" 
-                  name="requirements" 
-                  value={formData.requirements} 
-                  onChange={handleChange} 
-                  rows={5} 
-                  placeholder="Describe your business process and automation needs..."
-                  required 
-                />
-              </div>
-              
-              <div className="bg-muted p-4 rounded-md">
-                <p className="text-sm text-muted-foreground mb-2">
-                  For security, please complete the CAPTCHA verification.
-                </p>
-                <div className="h-12 flex items-center justify-center border border-border rounded-md bg-card">
-                  <p className="text-sm text-muted-foreground">
-                    CAPTCHA would appear here in a production environment
+    <Card className="w-full max-w-3xl shadow-lg">
+      <CardHeader className="bg-primary text-primary-foreground rounded-t-lg">
+        <CardTitle className="text-2xl">AI Integration Request</CardTitle>
+        <CardDescription className="text-primary-foreground/80">
+          Get started with AI automation for your business
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input 
+                id="name" 
+                name="name" 
+                value={formData.name} 
+                onChange={handleChange} 
+                required 
+                placeholder="John Doe"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input 
+                id="email" 
+                name="email" 
+                type="email" 
+                value={formData.email} 
+                onChange={handleChange} 
+                required 
+                placeholder="your@email.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company">Company Name</Label>
+              <Input 
+                id="company" 
+                name="company" 
+                value={formData.company} 
+                onChange={handleChange} 
+                required 
+                placeholder="Your Company"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input 
+                id="phone" 
+                name="phone" 
+                value={formData.phone} 
+                onChange={handleChange} 
+                required 
+                placeholder="(123) 456-7890"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <Label>Select Integration Plan</Label>
+            <RadioGroup 
+              value={formData.plan} 
+              onValueChange={handleRadioChange} 
+              className="flex flex-col space-y-3"
+            >
+              <div className="flex items-start space-x-3 border p-4 rounded-md hover:bg-muted/50 transition-colors">
+                <RadioGroupItem value="standard" id="standard" className="mt-1" />
+                <div>
+                  <Label htmlFor="standard" className="font-semibold text-base">Standard Integration ($1,999)</Label>
+                  <p className="text-muted-foreground text-sm">
+                    Basic AI workflow automation for small to medium businesses.
                   </p>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  This helps us prevent spam and automated submissions.
-                </p>
               </div>
-              
-              <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Submitting..." : "Submit Request"}
-              </Button>
-              
-              <p className="text-xs text-center text-muted-foreground">
-                By submitting this form, you agree to our privacy policy and terms of service.
+              <div className="flex items-start space-x-3 border p-4 rounded-md hover:bg-muted/50 transition-colors">
+                <RadioGroupItem value="enterprise" id="enterprise" className="mt-1" />
+                <div>
+                  <Label htmlFor="enterprise" className="font-semibold text-base">Enterprise Integration ($4,999)</Label>
+                  <p className="text-muted-foreground text-sm">
+                    Advanced AI integration with custom workflows and priority support.
+                  </p>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="requirements">Project Requirements</Label>
+            <Textarea 
+              id="requirements" 
+              name="requirements" 
+              value={formData.requirements} 
+              onChange={handleChange} 
+              rows={5} 
+              placeholder="Describe your business process and automation needs..."
+              required 
+            />
+          </div>
+          
+          <div className="bg-muted p-4 rounded-md">
+            <p className="text-sm text-muted-foreground mb-2">
+              For security, please complete the CAPTCHA verification.
+            </p>
+            <div className="h-12 flex items-center justify-center border border-border rounded-md bg-card">
+              <p className="text-sm text-muted-foreground">
+                CAPTCHA would appear here in a production environment
               </p>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              This helps us prevent spam and automated submissions.
+            </p>
+          </div>
+          
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Submitting..." : "Submit Request"}
+          </Button>
+          
+          <p className="text-xs text-center text-muted-foreground">
+            By submitting this form, you agree to our privacy policy and terms of service.
+          </p>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
