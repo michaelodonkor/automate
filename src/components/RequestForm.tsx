@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 const RequestForm = () => {
   const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,36 +20,70 @@ const RequestForm = () => {
     phone: "",
     plan: "standard",
     requirements: "",
-    captchaResponse: "",
+    website: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear email error when user starts typing
+    if (name === "email") {
+      setEmailError("");
+    }
   };
 
   const handleRadioChange = (value: string) => {
     setFormData((prev) => ({ ...prev, plan: value }));
   };
 
+  const isValidBusinessEmail = (email: string) => {
+    // Reject gmail.com addresses
+    if (email.toLowerCase().endsWith("@gmail.com")) {
+      return false;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate business email
+    if (!isValidBusinessEmail(formData.email)) {
+      setEmailError("Please use a business email address (Gmail not accepted)");
+      return;
+    }
+    
     setSubmitting(true);
 
     try {
-      // Submit to Supabase
+      // Create a dummy chatbot ID for now (this would normally come from a chatbot creation process)
+      const dummyChatbotId = "00000000-0000-0000-0000-000000000000";
+      
+      // Submit to Supabase with the correct schema
       const { error } = await supabase
         .from('integration_requests')
-        .insert([
-          { 
-            name: formData.name,
-            email: formData.email,
-            company: formData.company,
-            phone: formData.phone,
-            plan: formData.plan,
-            requirements: formData.requirements
-          }
-        ]);
+        .insert({
+          chatbot_id: dummyChatbotId,
+          website_url: formData.website || formData.company + ".com", // Use website if provided, otherwise use company name as fallback
+          // status and timestamps will be handled by default values
+        });
+      
+      // Also insert the consultation data
+      await supabase
+        .from('consultation_requests')
+        .insert({
+          contact_name: formData.name,
+          email: formData.email,
+          company_name: formData.company,
+          phone: formData.phone,
+          plan: formData.plan,
+          requirements: formData.requirements,
+          business_size: "unknown" // This field is required but not in our form
+        });
       
       if (error) throw error;
       
@@ -66,7 +101,7 @@ const RequestForm = () => {
         phone: "",
         plan: "standard",
         requirements: "",
-        captchaResponse: "",
+        website: "",
       });
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -81,13 +116,13 @@ const RequestForm = () => {
 
   return (
     <Card className="w-full max-w-3xl backdrop-blur-lg bg-white/10 border border-white/20 shadow-lg">
-      <CardHeader className="bg-primary/80 text-primary-foreground rounded-t-lg backdrop-blur-md border-b border-white/10">
+      <CardHeader className="bg-primary/70 text-primary-foreground rounded-t-lg backdrop-blur-md border-b border-white/10">
         <CardTitle className="text-2xl">AI Integration Request</CardTitle>
         <CardDescription className="text-primary-foreground/90">
           Get started with AI automation for your business
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 bg-background/30">
+      <CardContent className="p-6 bg-background/20 backdrop-blur-md">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -103,7 +138,7 @@ const RequestForm = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email">Business Email Address</Label>
               <Input 
                 id="email" 
                 name="email" 
@@ -111,9 +146,12 @@ const RequestForm = () => {
                 value={formData.email} 
                 onChange={handleChange} 
                 required 
-                placeholder="your@email.com"
-                className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
+                placeholder="your@company.com"
+                className={`bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent ${emailError ? 'border-red-500' : ''}`}
               />
+              {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="company">Company Name</Label>
@@ -136,6 +174,17 @@ const RequestForm = () => {
                 onChange={handleChange} 
                 required 
                 placeholder="(123) 456-7890"
+                className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="website">Company Website (Optional)</Label>
+              <Input 
+                id="website" 
+                name="website" 
+                value={formData.website} 
+                onChange={handleChange} 
+                placeholder="https://yourcompany.com"
                 className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
               />
             </div>
@@ -183,7 +232,7 @@ const RequestForm = () => {
             />
           </div>
           
-          <div className="bg-white/5 p-4 rounded-md border border-white/20">
+          <div className="bg-white/10 p-4 rounded-md border border-white/20 backdrop-blur-sm">
             <p className="text-sm text-muted-foreground mb-2">
               For security, please complete the CAPTCHA verification.
             </p>
