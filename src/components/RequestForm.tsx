@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const RequestForm = () => {
   const { toast } = useToast();
@@ -34,29 +35,41 @@ const RequestForm = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    // This would be replaced with your actual Supabase integration
-    // For now, we'll just simulate the submission
     try {
-      // Simulate API call
-      setTimeout(() => {
-        setSubmitting(false);
-        toast({
-          title: "Request Submitted",
-          description: "We'll be in touch soon to discuss your AI integration.",
-        });
-        
-        // Reset form
-        setFormData({
-          name: "",
-          email: "",
-          company: "",
-          phone: "",
-          plan: "standard",
-          requirements: "",
-          captchaResponse: "",
-        });
-      }, 1500);
+      // Submit to Supabase
+      const { error } = await supabase
+        .from('integration_requests')
+        .insert([
+          { 
+            name: formData.name,
+            email: formData.email,
+            company: formData.company,
+            phone: formData.phone,
+            plan: formData.plan,
+            requirements: formData.requirements
+          }
+        ]);
+      
+      if (error) throw error;
+      
+      setSubmitting(false);
+      toast({
+        title: "Request Submitted",
+        description: "We'll be in touch soon to discuss your AI integration.",
+      });
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        plan: "standard",
+        requirements: "",
+        captchaResponse: "",
+      });
     } catch (error) {
+      console.error("Error submitting form:", error);
       setSubmitting(false);
       toast({
         title: "Submission Error",
@@ -67,14 +80,14 @@ const RequestForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-3xl shadow-lg">
-      <CardHeader className="bg-primary text-primary-foreground rounded-t-lg">
+    <Card className="w-full max-w-3xl backdrop-blur-lg bg-white/10 border border-white/20 shadow-lg">
+      <CardHeader className="bg-primary/80 text-primary-foreground rounded-t-lg backdrop-blur-md border-b border-white/10">
         <CardTitle className="text-2xl">AI Integration Request</CardTitle>
-        <CardDescription className="text-primary-foreground/80">
+        <CardDescription className="text-primary-foreground/90">
           Get started with AI automation for your business
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6">
+      <CardContent className="p-6 bg-background/30">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -86,6 +99,7 @@ const RequestForm = () => {
                 onChange={handleChange} 
                 required 
                 placeholder="John Doe"
+                className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
               />
             </div>
             <div className="space-y-2">
@@ -98,6 +112,7 @@ const RequestForm = () => {
                 onChange={handleChange} 
                 required 
                 placeholder="your@email.com"
+                className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
               />
             </div>
             <div className="space-y-2">
@@ -109,6 +124,7 @@ const RequestForm = () => {
                 onChange={handleChange} 
                 required 
                 placeholder="Your Company"
+                className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
               />
             </div>
             <div className="space-y-2">
@@ -120,6 +136,7 @@ const RequestForm = () => {
                 onChange={handleChange} 
                 required 
                 placeholder="(123) 456-7890"
+                className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
               />
             </div>
           </div>
@@ -131,7 +148,7 @@ const RequestForm = () => {
               onValueChange={handleRadioChange} 
               className="flex flex-col space-y-3"
             >
-              <div className="flex items-start space-x-3 border p-4 rounded-md hover:bg-muted/50 transition-colors">
+              <div className="flex items-start space-x-3 border border-white/20 p-4 rounded-md hover:bg-white/10 transition-colors backdrop-blur-sm">
                 <RadioGroupItem value="standard" id="standard" className="mt-1" />
                 <div>
                   <Label htmlFor="standard" className="font-semibold text-base">Standard Integration ($1,999)</Label>
@@ -140,7 +157,7 @@ const RequestForm = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-start space-x-3 border p-4 rounded-md hover:bg-muted/50 transition-colors">
+              <div className="flex items-start space-x-3 border border-white/20 p-4 rounded-md hover:bg-white/10 transition-colors backdrop-blur-sm">
                 <RadioGroupItem value="enterprise" id="enterprise" className="mt-1" />
                 <div>
                   <Label htmlFor="enterprise" className="font-semibold text-base">Enterprise Integration ($4,999)</Label>
@@ -162,14 +179,15 @@ const RequestForm = () => {
               rows={5} 
               placeholder="Describe your business process and automation needs..."
               required 
+              className="bg-white/20 backdrop-blur-sm border-white/30 focus-visible:ring-accent"
             />
           </div>
           
-          <div className="bg-muted p-4 rounded-md">
+          <div className="bg-white/5 p-4 rounded-md border border-white/20">
             <p className="text-sm text-muted-foreground mb-2">
               For security, please complete the CAPTCHA verification.
             </p>
-            <div className="h-12 flex items-center justify-center border border-border rounded-md bg-card">
+            <div className="h-12 flex items-center justify-center border border-white/20 rounded-md bg-white/10 backdrop-blur-sm">
               <p className="text-sm text-muted-foreground">
                 CAPTCHA would appear here in a production environment
               </p>
@@ -179,7 +197,11 @@ const RequestForm = () => {
             </p>
           </div>
           
-          <Button type="submit" className="w-full" disabled={submitting}>
+          <Button 
+            type="submit" 
+            className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity" 
+            disabled={submitting}
+          >
             {submitting ? "Submitting..." : "Submit Request"}
           </Button>
           
